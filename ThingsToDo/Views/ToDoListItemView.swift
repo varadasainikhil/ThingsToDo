@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ToDoListItemView: View {
-    @StateObject var viewModel = ToDoListViewViewModel()
+    @StateObject var viewModel = ToDoListItemViewViewModel()
     var item : ToDoListItem
     var body: some View {
         HStack{
@@ -21,7 +21,7 @@ struct ToDoListItemView: View {
             Spacer()
             
             Button{
-                // 
+                viewModel.toggleIsDone(item: item)
             }label: {
                 if item.isDone{
                     ZStack{
@@ -35,6 +35,7 @@ struct ToDoListItemView: View {
                         .foregroundStyle(.black)
                 }
             }
+            .buttonStyle(PlainButtonStyle())
             
         }
     }

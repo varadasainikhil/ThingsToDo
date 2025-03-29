@@ -10,7 +10,7 @@ import FirebaseAuth
 import FirebaseFirestore
 
 struct ProfileView: View {
-    @State var viewModel = ProfileViewViewModel()
+    @StateObject var viewModel = ProfileViewViewModel()
     @State private var showingLoginView = false
     @State private var showingAlert = false
   
@@ -18,29 +18,57 @@ struct ProfileView: View {
     var body: some View {
         NavigationView{
             VStack{
-                Image(systemName: "person.circle.fill")
-                    .resizable()
-                    .frame(width: 200, height: 200)
-                
-                Text("Place holder text")
-                
-                Button("Log Out") {
-                    do{
-                        try Auth.auth().signOut()
-                        showingLoginView = true
-                    }
-                    catch{
-                        showingAlert = true
+                if let user = viewModel.user{
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .frame(width: 200, height: 200)
+                    
+                    HStack{
+                        Text("Name : ")
+                            .bold()
+                        Text(user.fullName)
+                        
                     }
                     
+                    HStack{
+                        Text("Email : ")
+                            .bold()
+                        Text(user.email)
+
+                    }
+                    
+                    HStack{
+                        Text("Member Since : ")
+                            .bold()
+                        Text("\(Date(timeIntervalSince1970:user.joined).formatted(date:.abbreviated ,time:.omitted))")
+                    
+                    }
+                        
+                    Button("Log Out") {
+                        if !viewModel.signOut(){
+                            showingAlert = true
+                        }
+                    }
+                    .padding(5)
+                    .padding(.horizontal, 5)
+                    .foregroundStyle(.white)
+                    .background(.red)
+                    .clipShape(.rect(cornerRadius: 5))
+                }
+                else{
+                    Text("Loading Profile...")
                 }
             }
             .navigationTitle("Profile")
+            .onAppear{
+                viewModel.fetchUser()
+            }
             .alert("Error", isPresented: $showingAlert){
                 //
             } message: {
                 Text("Error signing you out.")
             }
+            
         }
     }
 }
